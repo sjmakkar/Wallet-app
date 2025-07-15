@@ -3,6 +3,6 @@
   "compilerOptions": {
     "outDir": "dist"
   },
-  "include": ["src"],
+  "include": ["src", "../../apps/user-app/components/AddMoneyCard.tsx", "../../apps/user-app/components/BalanceCard.tsx", "../../apps/user-app/components/OnRampTransaction.tsx"],
   "exclude": ["node_modules", "dist"]
 }

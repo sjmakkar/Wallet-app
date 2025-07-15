@@ -5,7 +5,12 @@
       {
         "name": "next"
       }
-    ]
+    ],
+    "paths": {
+      "@repo/ui/*": ["../../packages/ui/src/*"],
+      "@repo/db/*": ["../../packages/db/src/*"],
+      "@repo/store/*": ["../../packages/store/src/*"],
+    }
   },
   "include": [
     "next-env.d.ts",
