@@ -1,0 +1,21 @@
+FROM node:20.12.0-alpine3.20
+
+# Set the working directory
+WORKDIR /user/src/app
+
+
+# Copy package.json and package-lock.json
+COPY package.json package-lock.json ./ turbo.json ./ tsconfig.json ./
+
+COPY APPS ./apps
+COPY packages ./packages
+
+#INSTALL DEPENDENCIES
+RUN npm install --legacy-peer-deps
+
+RUN npm run db-generate
+
+RUN npm run build
+
+CMD [ "npm" , "run", "start-user-app" ]
+
