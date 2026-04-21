@@ -18,30 +18,59 @@ app.post("/hdfcWebhook", async (req, res) => {
     };
 
     try {
-        await db.$transaction([
-            db.balance.updateMany({
-                where: {
-                    userId: Number(paymentInformation.userId)
-                },
-                data: {
-                    amount: {
-                        // You can also get this from your DB
-                        increment: Number(paymentInformation.amount)
-                    }
-                }
-            }),
-            db.onRampTransaction.updateMany({
+        const result = await db.$transaction(async (tx) => {
+            const transaction = await tx.onRampTransaction.findUnique({
                 where: {
                     token: paymentInformation.token
-                }, 
-                data: {
-                    status: "Success",
                 }
-            })
-        ]);
+            });
+
+            if (!transaction) {
+                return { ok: false as const, reason: "Transaction not found" };
+            }
+
+            const marked = await tx.onRampTransaction.updateMany({
+                where: {
+                    token: paymentInformation.token,
+                    status: "Processing"
+                },
+                data: {
+                    status: "Success"
+                }
+            });
+
+            if (marked.count === 0) {
+                return { ok: true as const, message: "Already processed" };
+            }
+
+            await tx.balance.upsert({
+                where: {
+                    userId: transaction.userId
+                },
+                update: {
+                    amount: {
+                        increment: transaction.amount
+                    }
+                },
+                create: {
+                    userId: transaction.userId,
+                    amount: transaction.amount,
+                    locked: 0
+                }
+            });
+
+            return { ok: true as const, message: "Captured" };
+        });
+
+        if (!result.ok) {
+            res.status(404).json({
+                message: result.reason
+            });
+            return;
+        }
 
         res.json({
-            message: "Captured"
+            message: result.message
         })
     } catch(e) {
         console.error(e);

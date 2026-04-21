@@ -23,6 +23,18 @@ export const authOptions = {
             if (existingUser) {
                 const passwordValidation = await bcrypt.compare(credentials.password, existingUser.password);
                 if (passwordValidation) {
+                    await db.balance.upsert({
+                        where: {
+                            userId: existingUser.id
+                        },
+                        update: {},
+                        create: {
+                            userId: existingUser.id,
+                            amount: 0,
+                            locked: 0
+                        }
+                    });
+
                     return {
                         id: existingUser.id.toString(),
                         name: existingUser.name,
@@ -36,7 +48,13 @@ export const authOptions = {
                 const user = await db.user.create({
                     data: {
                         number: credentials.phone,
-                        password: hashedPassword
+                        password: hashedPassword,
+                        Balance: {
+                            create: {
+                                amount: 0,
+                                locked: 0
+                            }
+                        }
                     }
                 });
             

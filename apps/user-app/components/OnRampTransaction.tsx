@@ -23,14 +23,17 @@ export const OnRampTransactions = ({
             {transactions.map(t => <div className="flex justify-between">
                 <div>
                     <div className="text-sm">
-                        Received INR
+                        Add Money via {t.provider}
                     </div>
                     <div className="text-slate-600 text-xs">
                         {t.time.toDateString()}
                     </div>
+                    <div className="text-slate-500 text-xs">
+                        {t.status}
+                    </div>
                 </div>
-                <div className="flex flex-col justify-center">
-                    + Rs {t.amount / 100}
+                <div className={`flex flex-col justify-center ${t.status === "Success" ? "text-green-600" : t.status === "Failed" ? "text-red-600" : "text-slate-600"}`}>
+                    {t.status === "Success" ? "+" : ""} Rs {t.amount / 100}
                 </div>
 
             </div>)}
