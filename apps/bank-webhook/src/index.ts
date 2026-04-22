@@ -4,6 +4,12 @@ const app = express();
 
 app.use(express.json())
 
+const PORT = Number(process.env.PORT) || 3003;
+app.listen(PORT, () => {
+  console.log(`Webhook running on ${PORT}`);
+});
+
+
 app.post("/hdfcWebhook", async (req, res) => {
     //TODO: Add zod validation here?
     //TODO: HDFC bank should ideally send us a secret so we know this is sent by them
